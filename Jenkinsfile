@@ -38,6 +38,7 @@ pipeline {
             dir('eksterraform') {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                 sh """
+                    pwd
                     terraform init
                     terraform workspace new ${params.cluster} || true
                     terraform workspace select ${params.cluster}
