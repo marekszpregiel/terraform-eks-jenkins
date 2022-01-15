@@ -26,7 +26,7 @@ pipeline {
     }
     stage('Set Terraform path') {
         steps {
-            sh 'terraform -version'
+            sh 'terraform version'
         }
     }
     stage('TF Plan') {
