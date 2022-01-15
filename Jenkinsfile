@@ -69,7 +69,7 @@ pipeline {
                     echo "hello"
                     ls -alrth $HOME/
                     ls -alrth $HOME/.kube
-                    #terraform apply -input=false -auto-approve ${plan}
+                    terraform apply -auto-approve ${plan}
                     #terraform output kubeconfig > $HOME/.kube/config
                 """
                 sh '#chown $(id -u):$(id -g) $HOME/.kube/config'
