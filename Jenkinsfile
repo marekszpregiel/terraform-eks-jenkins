@@ -72,9 +72,9 @@ pipeline {
                     #terraform apply -input=false -auto-approve ${plan}
                     #terraform output kubeconfig > $HOME/.kube/config
                 """
-                sh 'sudo chown $(id -u):$(id -g) $HOME/.kube/config'
-                sleep 30
-                sh 'kubectl get nodes'
+                sh 'chown $(id -u):$(id -g) $HOME/.kube/config'
+                #sleep 30
+                #sh 'kubectl get nodes'
                 }
             }
         }
