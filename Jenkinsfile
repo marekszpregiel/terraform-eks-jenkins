@@ -12,7 +12,7 @@ pipeline {
     stage('checkout') {
         steps {
             git branch: 'main',
-                credentialsId: '9f9d15ce-70ff-480f-9dd7-239948973470',
+                credentialsId: 'GITHUB_Credentials',
                 url: 'https://github.com/marekszpregiel/terraform-eks-jenkins'
         }
     }
