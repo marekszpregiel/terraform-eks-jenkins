@@ -43,8 +43,7 @@ pipeline {
                     terraform init
                     terraform workspace new ${params.cluster} || true
                     terraform workspace select ${params.cluster}
-                    terraform plan \
-                        -out ${plan}
+                    terraform plan -out=${plan}
                     echo ${params.cluster}
                 """
                 }
@@ -69,7 +68,7 @@ pipeline {
                     echo "hello"
                     ls -alrth $HOME/
                     ls -alrth $HOME/.kube
-                    terraform apply -auto-approve ${plan}
+                    terraform apply ${plan} -auto-approve
                     #terraform output kubeconfig > $HOME/.kube/config
                 """
                 sh '#chown $(id -u):$(id -g) $HOME/.kube/config'
