@@ -65,9 +65,8 @@ pipeline {
                     sh 'mkdir -p $HOME/.kube'
                 }
                 sh """
-                    echo "hello"
                     pwd
-                    ls -alrth
+                    cd ..
                     terraform apply -auto-approve ${plan}
                     #terraform output kubeconfig > $HOME/.kube/config
                 """
@@ -88,7 +87,7 @@ pipeline {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                 sh """
                     pwd
-                    ls -alrth
+                    cd ..
                     terraform workspace select ${params.cluster}
                     terraform destroy -auto-approve
                 """
