@@ -72,7 +72,7 @@ pipeline {
                     #terraform apply -input=false -auto-approve ${plan}
                     #terraform output kubeconfig > $HOME/.kube/config
                 """
-                sh 'chown $(id -u):$(id -g) $HOME/.kube/config'
+                sh '#chown $(id -u):$(id -g) $HOME/.kube/config'
                 sh '#kubectl get nodes'
                 }
             }
