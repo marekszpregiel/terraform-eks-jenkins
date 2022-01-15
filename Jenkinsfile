@@ -44,7 +44,6 @@ pipeline {
                     terraform workspace new ${params.cluster} || true
                     terraform workspace select ${params.cluster}
                     terraform plan \
-                        -var cluster-name=${params.cluster} \
                         -out ${plan}
                     echo ${params.cluster}
                 """
@@ -67,7 +66,10 @@ pipeline {
                     sh 'mkdir -p $HOME/.kube'
                 }
                 sh """
-                    terraform apply -input=false -auto-approve ${plan}
+                    echo "hello"
+                    ls -alrth $HOME/
+                    ls -alrth $HOME/.kube
+                    #terraform apply -input=false -auto-approve ${plan}
                     #terraform output kubeconfig > $HOME/.kube/config
                 """
                 sh 'sudo chown $(id -u):$(id -g) $HOME/.kube/config'
