@@ -35,11 +35,9 @@ pipeline {
       }    
         steps {
             script {
-            dir('eksterraform') {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                 sh """
                     pwd
-                    cd ..
                     terraform init
                     terraform workspace new ${params.cluster} || true
                     terraform workspace select ${params.cluster}
@@ -47,7 +45,6 @@ pipeline {
                     echo ${params.cluster}
                 """
                 }
-            }
         }
       }
     }
@@ -67,8 +64,8 @@ pipeline {
                 sh """
                     pwd
                     cd ..
-                    terraform apply -auto-approve ${plan}
-                    #terraform output kubeconfig > $HOME/.kube/config
+                    #terraform apply -auto-approve ${plan}
+                    #terraform output kubectl_config > $HOME/.kube/config
                 """
                 sh '#chown $(id -u):$(id -g) $HOME/.kube/config'
                 sh '#kubectl get nodes'
