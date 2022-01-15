@@ -37,12 +37,10 @@ pipeline {
             script {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                 sh """
-                    pwd
                     terraform init
                     terraform workspace new ${params.cluster} || true
                     terraform workspace select ${params.cluster}
                     terraform plan -out=${plan}
-                    echo ${params.cluster}
                 """
                 }
         }
@@ -51,27 +49,23 @@ pipeline {
     stage('TF Apply') {
       when {
         expression { params.action == 'create' }
-        }    
-        steps {
-            script {
-            dir('eksterraform') {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                if (fileExists('$HOME/.kube')) {
-                    echo '.kube Directory Exists'
-                } else {
-                    sh 'mkdir -p $HOME/.kube'
-                }
-                sh """
-                    pwd
-                    cd ..
-                    #terraform apply -auto-approve ${plan}
-                    #terraform output kubectl_config > $HOME/.kube/config
-                """
-                sh '#chown $(id -u):$(id -g) $HOME/.kube/config'
-                sh '#kubectl get nodes'
-                }
-            }
-        }
+      }    
+      steps {
+          script {
+              withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                  if (fileExists('$HOME/.kube')) {
+                      echo '.kube Directory Exists'
+                  } else {
+                      sh 'mkdir -p $HOME/.kube'
+                  }
+                  sh """
+                      terraform apply -auto-approve ${plan}
+                      terraform output kubectl_config > $HOME/.kube/config
+                      chown $(id -u):$(id -g) $HOME/.kube/config
+                      kubectl get nodes
+                  """
+              }
+          }
       }
     }
     stage('TF Destroy') {
@@ -79,18 +73,14 @@ pipeline {
           expression { params.action == 'destroy' }
       }
       steps {
-        script {
-            dir('eksterraform') {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                sh """
-                    pwd
-                    cd ..
-                    terraform workspace select ${params.cluster}
-                    terraform destroy -auto-approve
-                """
-                }
-            }
-        }
+          script {
+              withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                  sh """
+                      terraform workspace select ${params.cluster}
+                      terraform destroy -auto-approve
+                  """
+              }
+          }
       }
     }
   }
