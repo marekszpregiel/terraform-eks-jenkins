@@ -9,7 +9,9 @@ pipeline {
   stages {
     stage('checkout') {
         steps {
-            git 'https://github.com/marekszpregiel/terraform-eks-jenkins'
+            git branch: 'main',
+                credentialsId: '9f9d15ce-70ff-480f-9dd7-239948973470',
+                url: 'https://github.com/marekszpregiel/terraform-eks-jenkins'
         }
     }
     stage('Setup') {
