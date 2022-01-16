@@ -1,7 +1,7 @@
 pipeline {
    parameters {
-       choice(name: 'action', choices: 'create\ndestroy', description: 'Create/update or destroy the eks cluster.')
-       string(name: 'cluster', defaultValue : 'demo', description: "EKS cluster name;eg demo creates cluster named eks-demo.")
+       choice(name: 'action', choices: 'create\ndestroy\ndeploy', description: 'Create/update/destroy the eks cluster or deploy new version of pod and service in k8s.')
+       string(name: 'cluster', defaultValue : 'eks-cluster', description: "EKS cluster name.")
    }
   
   agent any
@@ -78,6 +78,24 @@ pipeline {
                   sh """
                       terraform workspace select ${params.cluster}
                       terraform destroy -auto-approve
+                  """
+              }
+          }
+      }
+    }
+    stage('K8S Deploy') {
+      when {
+        expression { params.action == 'deploy' }
+      }
+      steps {
+          script {
+              withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+                  sh """
+                      kubectl get nodes
+                      kubectl get all
+                      kubectl get pod | grep deer || (kubectl apply -f k8s/deer-pod.yml)
+                      kubectl get service | grep deer || (kubectl apply -f k8s/deer-service.yml)
+                      kubectl get pods -o wide
                   """
               }
           }
