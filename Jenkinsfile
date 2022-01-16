@@ -61,7 +61,7 @@ pipeline {
                   sh """
                       terraform apply -auto-approve ${plan}
                       terraform output kubectl_config > $HOME/.kube/config
-                      chown $(id -u):$(id -g) $HOME/.kube/config
+                      chown 0:0 $HOME/.kube/config
                       kubectl get nodes
                   """
               }
