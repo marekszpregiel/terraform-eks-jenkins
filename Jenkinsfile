@@ -61,7 +61,7 @@ pipeline {
                   sh """
                       terraform apply -auto-approve ${plan}
                       terraform output kubectl_config > $HOME/.kube/config
-                      sed -i '/EOF/d' $HOME/.kube/config
+                      sed -i '/EOT/d' $HOME/.kube/config
                       sed -i '/^\$/d' $HOME/.kube/config
                       chown 0:0 $HOME/.kube/config
                       kubectl get nodes
@@ -93,6 +93,8 @@ pipeline {
           script {
               withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                   sh """
+                      pws
+                      whoami
                       kubectl get nodes
                       kubectl get all
                       kubectl get pod | grep deer || (kubectl apply -f k8s/deer-pod.yml)
