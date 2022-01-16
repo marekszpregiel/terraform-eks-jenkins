@@ -95,6 +95,8 @@ pipeline {
                   sh """
                       pwd
                       whoami
+                      hostname
+                      ls -alrth
                       kubectl get nodes
                       kubectl get all
                       kubectl get pod | grep deer || (kubectl apply -f k8s/deer-pod.yml)
