@@ -93,7 +93,7 @@ pipeline {
           script {
               withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                   sh """
-                      pws
+                      pwd
                       whoami
                       kubectl get nodes
                       kubectl get all
