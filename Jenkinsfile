@@ -100,6 +100,7 @@ pipeline {
                       hostname
                       ls -alrth
                       echo $PATH
+                      echo $HOME
                       which aws-iam-authenticator
                       aws-iam-authenticator help
                       kubectl get nodes
