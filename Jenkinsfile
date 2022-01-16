@@ -59,6 +59,7 @@ pipeline {
                       sh 'mkdir -p $HOME/.kube'
                   }
                   sh """
+                      PATH=$PATH:$HOME/bin
                       terraform apply -auto-approve ${plan}
                       terraform output kubectl_config > $HOME/.kube/config
                       sed -i '/EOT/d' $HOME/.kube/config
@@ -78,6 +79,7 @@ pipeline {
           script {
               withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                   sh """
+                      PATH=$PATH:$HOME/bin
                       kubectl get deployment | grep deer || (kubectl delete -f deer-deployment)
                       kubectl get service | grep deer || (kubectl delete -f deer-service-loadbalancer)
                       terraform workspace select ${params.cluster}
@@ -95,10 +97,7 @@ pipeline {
           script {
               withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                   sh """
-                      echo $PATH
                       PATH=$PATH:$HOME/bin
-                      echo $PATH
-                      aws-iam-authenticator help
                       kubectl get nodes
                       kubectl get all
                       kubectl get pod | grep deer || (kubectl apply -f k8s/deer-deployment.yml)
