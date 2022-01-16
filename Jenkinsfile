@@ -64,7 +64,7 @@ pipeline {
                       terraform output kubectl_config > $HOME/.kube/config
                       sed -i '/EOT/d' $HOME/.kube/config
                       sed -i '/^\$/d' $HOME/.kube/config
-                      chown 0:0 $HOME/.kube/config
+                      chown $(id -u):$(id -g) $HOME/.kube/config
                       kubectl get nodes
                   """
               }
@@ -80,10 +80,11 @@ pipeline {
               withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                   sh """
                       PATH=$PATH:$HOME/bin
-                      kubectl get deployment | grep deer || (kubectl delete -f deer-deployment)
-                      kubectl get service | grep deer || (kubectl delete -f deer-service-loadbalancer)
+                      kubectl get deployment | grep deer && (kubectl delete -f deer-deployment)
+                      kubectl get service | grep deer && (kubectl delete -f deer-service-loadbalancer)
                       terraform workspace select ${params.cluster}
                       terraform destroy -auto-approve
+                      rm -rf /root/.kube/*
                   """
               }
           }
@@ -100,8 +101,8 @@ pipeline {
                       PATH=$PATH:$HOME/bin
                       kubectl get nodes
                       kubectl get all
-                      kubectl get pod | grep deer || (kubectl apply -f k8s/deer-deployment.yml)
-                      kubectl get service | grep deer || (kubectl apply -f k8s/deer-loadbalancer.yml)
+                      kubectl apply -f k8s/deer-deployment.yml
+                      kubectl apply -f k8s/deer-loadbalancer.yml
                       kubectl get pods -o wide
                   """
               }
