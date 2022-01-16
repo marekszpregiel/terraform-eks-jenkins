@@ -62,7 +62,7 @@ pipeline {
                       terraform apply -auto-approve ${plan}
                       terraform output kubectl_config > $HOME/.kube/config
                       sed -i '/EOF/d' $HOME/.kube/config
-                      sed -i '/^$/d' $HOME/.kube/config
+                      sed -i '/^\$/d' $HOME/.kube/config
                       chown 0:0 $HOME/.kube/config
                       kubectl get nodes
                   """
