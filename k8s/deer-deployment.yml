@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: deer-deployment
+  labels:
+    app: deer
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: deer
+  template:
+    metadata:
+      labels:
+        app: deer
+    spec:
+      containers:
+      - name: deer
+        image: marekszpregiel/nginx_hello_deer:latest
+        ports:
+        - containerPort: 80

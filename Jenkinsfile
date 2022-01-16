@@ -100,8 +100,9 @@ pipeline {
                       which aws-iam-authenticator
                       kubectl get nodes
                       kubectl get all
-                      kubectl get pod | grep deer || (kubectl apply -f k8s/deer-pod.yml)
-                      kubectl get service | grep deer || (kubectl apply -f k8s/deer-service.yml)
+                      kubectl get pod | grep deer || (kubectl apply -f k8s/deer-deployment.yml)
+                      kubectl get service | grep deer || (kubectl apply -f k8s/deer-loadbalancer.yml)
+                      kubectl get service/deer-service-loadbalancer |  awk {'print $1" " $2 " " $4 " " $5'}
                       kubectl get pods -o wide
                   """
               }
