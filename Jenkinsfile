@@ -19,7 +19,7 @@ pipeline {
     stage('Setup') {
         steps {
             script {
-                currentBuild.displayName = "#" + env.BUILD_NUMBER + " " + params.action + " eks-" + params.cluster
+                currentBuild.displayName = "#" + env.BUILD_NUMBER + " " + params.action + " " + params.cluster
                 plan = params.cluster + '.plan'
             }
         }
