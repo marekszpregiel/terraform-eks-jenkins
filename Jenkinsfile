@@ -118,7 +118,7 @@ pipeline {
                       kubectl get service/deer-service-loadbalancer | awk {'print \$1" " \$2 " " \$4 " " \$5'} | column -t || echo 'Service deer-service-loadbalancer is not active'
                       kubectl get nodes
                       kubectl get all
-                      kubectl get pods -o wide
+                      kubectl get pods -o wide --all-namespaces
                   """
               }
           }
