@@ -66,7 +66,6 @@ pipeline {
                       sed -i '/EOT/d' $HOME/.kube/config
                       sed -i '/^\$/d' $HOME/.kube/config
                       chown \$(id -u):\$(id -g) $HOME/.kube/config
-                      kubectl get nodes
                   """
               }
           }
@@ -116,7 +115,7 @@ pipeline {
               withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                   sh """
                       PATH=$PATH:$HOME/bin
-                      kubectl get service/deer-service-loadbalancer | awk {'print \$1" " \$2 " " \$4 " " \$5'} | column -t
+                      kubectl get service/deer-service-loadbalancer | awk {'print \$1" " \$2 " " \$4 " " \$5'} | column -t || echo 'Service deer-service-loadbalancer is not active'
                       kubectl get nodes
                       kubectl get all
                       kubectl get pods -o wide
