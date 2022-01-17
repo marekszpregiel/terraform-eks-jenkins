@@ -1,6 +1,6 @@
 pipeline {
    parameters {
-       choice(name: 'action', choices: 'create\ndestroy\ndeploy\nshow', description: 'Create/update/destroy the eks cluster or deploy new version of pod and service in k8s.')
+       choice(name: 'action', choices: 'create\ndestroy\ndeploy\nshow', description: 'Create/update/destroy the eks cluster.\nDeploy new version of deployment and service in k8s.\nShow information from kubectl.')
        string(name: 'cluster', defaultValue : 'eks-cluster', description: "EKS cluster name.")
    }
   
