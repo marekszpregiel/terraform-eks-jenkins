@@ -37,6 +37,7 @@ pipeline {
             script {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                 sh """
+                    PATH=$PATH:$HOME/bin
                     terraform init
                     terraform workspace new ${params.cluster} || true
                     terraform workspace select ${params.cluster}
@@ -59,6 +60,7 @@ pipeline {
                       sh 'mkdir -p $HOME/.kube'
                   }
                   sh """
+                      PATH=$PATH:$HOME/bin
                       terraform apply -auto-approve ${plan}
                       terraform output kubectl_config > $HOME/.kube/config
                       sed -i '/EOT/d' $HOME/.kube/config
@@ -78,6 +80,7 @@ pipeline {
           script {
               withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                   sh """
+                      PATH=$PATH:$HOME/bin
                       kubectl get deployment | grep deer && (kubectl delete -f deer-deployment.yml)
                       kubectl get service | grep deer && (kubectl delete -f deer-service-loadbalancer.yml)
                       terraform workspace select ${params.cluster}
@@ -96,6 +99,7 @@ pipeline {
           script {
               withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                   sh """
+                      PATH=$PATH:$HOME/bin
                       kubectl apply -f k8s/deer-deployment.yml
                       kubectl apply -f k8s/deer-service-loadbalancer.yml
                   """
@@ -111,6 +115,7 @@ pipeline {
           script {
               withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                   sh """
+                      PATH=$PATH:$HOME/bin
                       kubectl get service/deer-service-loadbalancer | awk {'print \$1" " \$2 " " \$4 " " \$5'} | column -t
                       kubectl get nodes
                       kubectl get all
