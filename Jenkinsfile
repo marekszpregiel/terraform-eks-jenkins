@@ -63,7 +63,7 @@ pipeline {
                       terraform output kubectl_config > $HOME/.kube/config
                       sed -i '/EOT/d' $HOME/.kube/config
                       sed -i '/^\$/d' $HOME/.kube/config
-                      chown $(id -u):$(id -g) $HOME/.kube/config
+                      chown \$(id -u):\$(id -g) $HOME/.kube/config
                       kubectl get nodes
                   """
               }
