@@ -1,7 +1,10 @@
+// Define variables
+def tmpVariable = "eks-cluster"
+
+//Pipeline
 pipeline {
    parameters {
-       choice(name: 'action', choices: 'create\ndestroy\ndeploy\nshow', description: 'Create/update/destroy the eks cluster.\nDeploy new version of deployment and service in k8s.\nShow information from kubectl.')
-       string(name: 'cluster', defaultValue : 'eks-cluster', description: "EKS cluster name.")
+       choice(name: 'action', choices: 'create\ndestroy\ndeploy\nshow', description: 'Create/update/destroy the eks cluster.\nDeploy new version of deployment and service in k8s.\nShow information from k8s.')
    }
   
   agent any
@@ -9,7 +12,7 @@ pipeline {
       terraform 'terraform'
   } 
   stages {
-    stage('checkout') {
+    stage('Checkout') {
         steps {
             git branch: 'main',
                 credentialsId: 'GITHUB_Credentials',
@@ -19,12 +22,12 @@ pipeline {
     stage('Setup') {
         steps {
             script {
-                currentBuild.displayName = "#" + env.BUILD_NUMBER + " " + params.action + " " + params.cluster
-                plan = params.cluster + '.plan'
+                currentBuild.displayName = "#" + env.BUILD_NUMBER + " " + params.action + " " + ${tmpVariable}
+                plan = ${tmpVariable} + '.plan'
             }
         }
     }
-    stage('Set Terraform path') {
+    stage('Get Terraform version') {
         steps {
             sh 'terraform version'
         }
@@ -37,10 +40,9 @@ pipeline {
             script {
                 withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                 sh """
-                    PATH=$PATH:$HOME/bin
                     terraform init
-                    terraform workspace new ${params.cluster} || true
-                    terraform workspace select ${params.cluster}
+                    terraform workspace new ${tmpVariable} || true
+                    terraform workspace select ${tmpVariable}
                     terraform plan -out=${plan}
                 """
                 }
@@ -60,7 +62,6 @@ pipeline {
                       sh 'mkdir -p $HOME/.kube'
                   }
                   sh """
-                      PATH=$PATH:$HOME/bin
                       terraform apply -auto-approve ${plan}
                       terraform output kubectl_config > $HOME/.kube/config
                       sed -i '/EOT/d' $HOME/.kube/config
@@ -79,10 +80,9 @@ pipeline {
           script {
               withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                   sh """
-                      PATH=$PATH:$HOME/bin
                       kubectl get deployment | grep deer && (kubectl delete -f deer-deployment.yml)
                       kubectl get service | grep deer && (kubectl delete -f deer-service-loadbalancer.yml)
-                      terraform workspace select ${params.cluster}
+                      terraform workspace select ${tmpVariable}
                       terraform destroy -auto-approve
                       rm -rf /root/.kube/*
                   """
@@ -98,7 +98,6 @@ pipeline {
           script {
               withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                   sh """
-                      PATH=$PATH:$HOME/bin
                       kubectl apply -f k8s/deer-deployment.yml
                       kubectl apply -f k8s/deer-service-loadbalancer.yml
                   """
@@ -114,7 +113,6 @@ pipeline {
           script {
               withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                   sh """
-                      PATH=$PATH:$HOME/bin
                       kubectl get service/deer-service-loadbalancer | awk {'print \$1" " \$2 " " \$4 " " \$5'} | column -t || echo 'Service deer-service-loadbalancer is not active'
                       kubectl get nodes
                       kubectl get all --all-namespaces
