@@ -82,6 +82,7 @@ pipeline {
                   sh """
                       kubectl get deployment | grep deer && (kubectl delete -f k8s/deer-deployment.yml)
                       kubectl get service | grep deer && (kubectl delete -f k8s/deer-service-loadbalancer.yml)
+                      sleep 30
                       terraform workspace select ${tmpVariable}
                       terraform destroy -auto-approve
                       rm -rf /root/.kube/*
