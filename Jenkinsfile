@@ -22,8 +22,8 @@ pipeline {
     stage('Setup') {
         steps {
             script {
-                currentBuild.displayName = "#" + env.BUILD_NUMBER + " " + params.action + " " + \${tmpVariable}
-                plan = ${tmpVariable} + '.plan'
+                currentBuild.displayName = "#" + env.BUILD_NUMBER + " " + params.action + " " + tmpVariable
+                plan = tmpVariable + '.plan'
             }
         }
     }
