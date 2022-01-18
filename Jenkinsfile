@@ -80,8 +80,8 @@ pipeline {
           script {
               withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                   sh """
-                      kubectl get deployment | grep deer && (kubectl delete -f deer-deployment.yml)
-                      kubectl get service | grep deer && (kubectl delete -f deer-service-loadbalancer.yml)
+                      kubectl get deployment | grep deer && (kubectl delete -f k8s/deer-deployment.yml)
+                      kubectl get service | grep deer && (kubectl delete -f k8s/deer-service-loadbalancer.yml)
                       terraform workspace select ${tmpVariable}
                       terraform destroy -auto-approve
                       rm -rf /root/.kube/*
