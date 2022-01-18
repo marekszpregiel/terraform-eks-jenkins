@@ -113,7 +113,7 @@ pipeline {
           script {
               withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', accessKeyVariable: 'AWS_ACCESS_KEY_ID', credentialsId: 'AWS_Credentials', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
                   sh """
-                      kubectl get service/deer-service-loadbalancer | awk {'print \$1" " \$2 " " \$4 " " \$5'} || echo 'Service deer-service-loadbalancer is not active'
+                      kubectl get service/deer-service-loadbalancer | awk {'print \$4'} || echo 'Service deer-service-loadbalancer is not active'
                       kubectl get nodes
                       kubectl get all --all-namespaces
                       kubectl get pods -o wide --all-namespaces
