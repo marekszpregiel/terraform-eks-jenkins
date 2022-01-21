@@ -15,7 +15,6 @@ pipeline {
     stage('Checkout') {
         steps {
             git branch: 'main',
-                credentialsId: 'GITHUB_Credentials',
                 url: 'https://github.com/marekszpregiel/terraform-eks-jenkins'
         }
     }
